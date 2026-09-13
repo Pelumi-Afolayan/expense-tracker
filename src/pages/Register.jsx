@@ -3,6 +3,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import { supabase } from '../lib/supabase'
+import GoogleAuthButton from '../components/GoogleAuthButton'
 
 function Register() {
   // Store the registration form values.
@@ -93,9 +94,24 @@ function Register() {
         </p>
       )}
 
+
+        <div className="mt-8">
+        <GoogleAuthButton />
+      </div>
+
+      <div className="my-6 flex items-center gap-4">
+        <div className="h-px flex-1 bg-slate-200" />
+
+        <span className="text-sm text-slate-400">
+          or continue with email
+        </span>
+
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
+
       <form
         onSubmit={handleRegister}
-        className="mt-8 space-y-5"
+        className="space-y-5"
       >
         <div>
           <label

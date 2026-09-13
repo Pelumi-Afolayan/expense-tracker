@@ -1,22 +1,9 @@
-function TransactionList({
-  transactions,
-  onEdit,
-  onDelete,
-}) {
-  const formatDate = (date) => {
-    return new Date(`${date}T00:00:00`).toLocaleDateString(
-      'en-NG',
-      {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      },
-    )
-  }
+import { Pencil, ReceiptText, Trash2 } from 'lucide-react'
 
-  const handleDeleteClick = (transaction) => {
+function TransactionList({ transactions, onEdit, onDelete }) {
+  const handleDelete = (transaction) => {
     const confirmed = window.confirm(
-      `Delete "${transaction.title}"? This action cannot be undone.`,
+      `Are you sure you want to delete "${transaction.title}"?`,
     )
 
     if (confirmed) {
@@ -25,34 +12,30 @@ function TransactionList({
   }
 
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-sm">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            Transactions
-          </h2>
+    <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-slate-900">
+          Transactions
+        </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Your recorded income and expenses.
-          </p>
-        </div>
-
-        <p className="self-start rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
-          {transactions.length}{' '}
-          {transactions.length === 1
-            ? 'transaction'
-            : 'transactions'}
+        <p className="mt-1 text-sm text-slate-500">
+          View and manage your income and expenses.
         </p>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="rounded-xl bg-slate-50 p-8 text-center">
-          <p className="font-medium text-slate-700">
-            No transactions found
-          </p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+          <div className="mb-4 rounded-full bg-emerald-50 p-4 text-emerald-600">
+            <ReceiptText size={28} />
+          </div>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Add a transaction or change your filters.
+          <h3 className="font-semibold text-slate-900">
+            No transactions found
+          </h3>
+
+          <p className="mt-2 max-w-sm text-sm text-slate-500">
+            Add your first transaction or clear your filters to see
+            your transactions here.
           </p>
         </div>
       ) : (
@@ -63,59 +46,43 @@ function TransactionList({
               className="flex flex-col gap-4 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold text-slate-900">
-                    {transaction.title}
-                  </h3>
+                <h3 className="font-semibold text-slate-900">
+                  {transaction.title}
+                </h3>
 
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
-                    {transaction.category}
-                  </span>
-
-                  <span
-                    className={
-                      transaction.type === 'income'
-                        ? 'rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700'
-                        : 'rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-600'
-                    }
-                  >
-                    {transaction.type === 'income'
-                      ? 'Income'
-                      : 'Expense'}
-                  </span>
-                </div>
-
-                <p className="mt-2 text-sm text-slate-500">
-                  {formatDate(transaction.date)}
+                <p className="mt-1 text-sm text-slate-500">
+                  {transaction.category} • {transaction.date}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center justify-between gap-3 sm:justify-end">
                 <p
                   className={
                     transaction.type === 'income'
-                      ? 'font-bold text-emerald-600'
-                      : 'font-bold text-red-500'
+                      ? 'mr-2 font-bold text-emerald-600'
+                      : 'mr-2 font-bold text-red-500'
                   }
                 >
                   {transaction.type === 'income' ? '+' : '-'}₦
-                  {transaction.amount.toLocaleString()}
+                  {Number(transaction.amount).toLocaleString()}
                 </p>
 
                 <button
                   type="button"
                   onClick={() => onEdit(transaction)}
-                  className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100"
+                  aria-label={`Edit ${transaction.title}`}
+                  className="rounded-lg bg-blue-50 p-2 text-blue-600 transition hover:bg-blue-100"
                 >
-                  Edit
+                  <Pencil size={18} />
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => handleDeleteClick(transaction)}
-                  className="rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
+                  onClick={() => handleDelete(transaction)}
+                  aria-label={`Delete ${transaction.title}`}
+                  className="rounded-lg bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
                 >
-                  Delete
+                  <Trash2 size={18} />
                 </button>
               </div>
             </article>

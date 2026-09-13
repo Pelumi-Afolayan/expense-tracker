@@ -8,6 +8,9 @@ import TransactionFilters from '../components/TransactionFilters'
 import TransactionForm from '../components/TransactionForm'
 import TransactionList from '../components/TransactionList'
 import DashboardLayout from '../components/DashboardLayout'
+import DashboardLoading from '../components/DashboardLoading'
+
+
 
 // Return today's date in the format required by an HTML date input.
 const getToday = () => new Date().toISOString().split('T')[0]
@@ -310,14 +313,14 @@ function Dashboard({ user }) {
   })
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-100">
-        <p className="font-medium text-slate-600">
-          Loading your dashboard...
-        </p>
-      </main>
-    )
-  }
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-100">
+      <p className="font-medium text-slate-600">
+        Loading your dashboard...
+      </p>
+    </main>
+  )
+}
 
   return (
   <DashboardLayout
