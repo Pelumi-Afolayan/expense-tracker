@@ -333,7 +333,7 @@ function Dashboard({ user }) {
       </p>
     )}
 
-    <div id="overview">
+    <div id="overview" className="scroll-mt-24">
       <SummaryCards
         balance={balance}
         totalIncome={totalIncome}
@@ -341,7 +341,7 @@ function Dashboard({ user }) {
       />
     </div>
 
-    <div id="analytics">
+    <div id="analytics" className='scroll-mt-24'>
       <FinanceChart transactions={transactions} />
       <CurrencyConverter balance={balance} />
     </div>
