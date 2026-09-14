@@ -77,7 +77,7 @@ function AuthLayout({
       </section>
 
       {/* Authentication form panel. */}
-      <section className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-8">
+      <section className="flex min-h-screen items-start justify-center px-4 pb-10 pt-8 sm:px-6 sm:pt-10 lg:items-center lg:py-10">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="mb-10 flex items-center gap-3 lg:hidden">
