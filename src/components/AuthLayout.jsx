@@ -9,10 +9,9 @@ function AuthLayout({
   description,
   children,
 }) {
-  
-    return (
+  return (
     <main className="min-h-screen bg-slate-100 lg:grid lg:grid-cols-2">
-      {/* Branding panel for larger screens. */}
+      {/* Branding panel shown only on larger screens. */}
       <section className="hidden min-h-screen flex-col justify-between bg-slate-950 p-12 text-white lg:flex">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500 text-slate-950">
@@ -76,27 +75,28 @@ function AuthLayout({
         </p>
       </section>
 
-      {/* Authentication form panel. */}
-      <section className="flex min-h-screen items-start justify-center px-4 pb-10 pt-8 sm:px-6 sm:pt-10 lg:items-center lg:py-10">
-        <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-slate-950">
-              <WalletCards size={24} />
-            </div>
-
-            <div>
-              <p className="font-bold text-slate-900">
-                Expense Tracker
-              </p>
-
-              <p className="text-xs text-slate-500">
-                Personal finance made simple
-              </p>
-            </div>
+      {/* Authentication side of the page. */}
+      <section className="flex min-h-screen flex-col px-4 pb-8 pt-6 sm:px-6 sm:pt-8 lg:items-center lg:justify-center lg:py-10">
+        {/* Logo shown only on mobile and tablet screens. */}
+        <div className="mx-auto flex w-full max-w-md items-center gap-3 lg:hidden">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-slate-950">
+            <WalletCards size={24} />
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+          <div>
+            <p className="font-bold text-slate-900">
+              Expense Tracker
+            </p>
+
+            <p className="text-xs text-slate-500">
+              Personal finance made simple
+            </p>
+          </div>
+        </div>
+
+        {/* Centre the form inside the space below the mobile logo. */}
+        <div className="flex w-full flex-1 items-center justify-center py-8 lg:flex-none lg:py-0">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm sm:p-8">
             <h1 className="text-3xl font-bold text-slate-900">
               {title}
             </h1>
