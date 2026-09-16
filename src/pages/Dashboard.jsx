@@ -392,8 +392,15 @@ function Dashboard({ user }) {
     </div>
 
     <div id="analytics" className='scroll-mt-24'>
-      <FinanceChart transactions={transactions} />
-      <CurrencyConverter balance={balance} />
+      <FinanceChart 
+      transactions={transactions}
+      preferredCurrency={preferredCurrency} />
+
+
+
+      <CurrencyConverter 
+      balance={balance}
+      preferredCurrency={preferredCurrency} />
     </div>
 
     <div id="transactions">
@@ -404,6 +411,7 @@ function Dashboard({ user }) {
         onSubmit={handleSubmit}
         onCancelEdit={handleCancelEdit}
         saving={saving}
+        preferredCurrency={preferredCurrency}
       />
 
       <TransactionFilters
@@ -417,6 +425,7 @@ function Dashboard({ user }) {
         transactions={filteredTransactions}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        preferredCurrency={preferredCurrency}
       />
     </div>
   </DashboardLayout>

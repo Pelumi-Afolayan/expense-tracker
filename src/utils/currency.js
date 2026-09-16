@@ -1,19 +1,39 @@
 import { currencies } from '../data/currencies'
 
-export const formatCurrency = (
-  amount,
-  currencyCode = 'NGN',
-) => {
+const getCurrencyLocale = (currencyCode) => {
   const selectedCurrency = currencies.find(
     (currency) => currency.code === currencyCode,
   )
 
-  const locale = selectedCurrency?.locale || 'en-US'
+  return selectedCurrency?.locale || 'en-US'
+}
 
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits:
-      currencyCode === 'JPY' ? 0 : 2,
-  }).format(Number(amount) || 0)
+export const formatCurrency = (
+  amount,
+  currencyCode = 'NGN',
+) => {
+  return new Intl.NumberFormat(
+    getCurrencyLocale(currencyCode),
+    {
+      style: 'currency',
+      currency: currencyCode,
+      maximumFractionDigits:
+        currencyCode === 'JPY' ? 0 : 2,
+    },
+  ).format(Number(amount) || 0)
+}
+
+export const formatCompactCurrency = (
+  amount,
+  currencyCode = 'NGN',
+) => {
+  return new Intl.NumberFormat(
+    getCurrencyLocale(currencyCode),
+    {
+      style: 'currency',
+      currency: currencyCode,
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    },
+  ).format(Number(amount) || 0)
 }

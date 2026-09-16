@@ -1,6 +1,16 @@
-import { Pencil, ReceiptText, Trash2 } from 'lucide-react'
+import {
+  Pencil,
+  ReceiptText,
+  Trash2,
+} from 'lucide-react'
+import { formatCurrency } from '../utils/currency'
 
-function TransactionList({ transactions, onEdit, onDelete }) {
+function TransactionList({
+  transactions,
+  onEdit,
+  onDelete,
+  preferredCurrency,
+}) {
   const handleDelete = (transaction) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${transaction.title}"?`,
@@ -34,8 +44,8 @@ function TransactionList({ transactions, onEdit, onDelete }) {
           </h3>
 
           <p className="mt-2 max-w-sm text-sm text-slate-500">
-            Add your first transaction or clear your filters to see
-            your transactions here.
+            Add your first transaction or clear your
+            filters to see your transactions here.
           </p>
         </div>
       ) : (
@@ -51,7 +61,8 @@ function TransactionList({ transactions, onEdit, onDelete }) {
                 </h3>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  {transaction.category} • {transaction.date}
+                  {transaction.category} •{' '}
+                  {transaction.date}
                 </p>
               </div>
 
@@ -63,8 +74,14 @@ function TransactionList({ transactions, onEdit, onDelete }) {
                       : 'mr-2 font-bold text-red-500'
                   }
                 >
-                  {transaction.type === 'income' ? '+' : '-'}₦
-                  {Number(transaction.amount).toLocaleString()}
+                  {transaction.type === 'income'
+                    ? '+'
+                    : '-'}
+
+                  {formatCurrency(
+                    transaction.amount,
+                    preferredCurrency,
+                  )}
                 </p>
 
                 <button
@@ -78,7 +95,9 @@ function TransactionList({ transactions, onEdit, onDelete }) {
 
                 <button
                   type="button"
-                  onClick={() => handleDelete(transaction)}
+                  onClick={() =>
+                    handleDelete(transaction)
+                  }
                   aria-label={`Delete ${transaction.title}`}
                   className="rounded-lg bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
                 >

@@ -3,6 +3,7 @@ import {
   ShieldCheck,
   WalletCards,
 } from 'lucide-react'
+import InstallAppButton from './InstallAppButton'
 
 function AuthLayout({
   title,
@@ -94,18 +95,24 @@ function AuthLayout({
           </div>
         </div>
 
-        {/* Centre the form inside the space below the mobile logo. */}
+        {/* Centre the form inside the available space. */}
         <div className="flex w-full flex-1 items-center justify-center py-8 lg:flex-none lg:py-0">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <h1 className="text-3xl font-bold text-slate-900">
-              {title}
-            </h1>
+          {/* This wrapper keeps the form and install button together. */}
+          <div className="w-full max-w-md">
+            <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+              <h1 className="text-3xl font-bold text-slate-900">
+                {title}
+              </h1>
 
-            <p className="mt-2 text-slate-500">
-              {description}
-            </p>
+              <p className="mt-2 text-slate-500">
+                {description}
+              </p>
 
-            {children}
+              {children}
+            </div>
+
+            {/* Appears only when the browser supports installation. */}
+            <InstallAppButton />
           </div>
         </div>
       </section>

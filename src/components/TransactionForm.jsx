@@ -7,7 +7,10 @@ function TransactionForm({
   onSubmit,
   onCancelEdit,
   saving,
+  preferredCurrency,
 }) {
+
+
   const isEditing = editingId !== null
 
   // Display categories based on the selected transaction type.
@@ -58,8 +61,12 @@ function TransactionForm({
             htmlFor="amount"
             className="mb-2 block text-sm font-medium text-slate-700"
           >
-            Amount
+            Amount ({preferredCurrency})
           </label>
+
+          <p className="mt-2 text-xs text-slate-500">
+            Enter this amount in your dashboard currency.
+          </p>
 
           <input
             id="amount"

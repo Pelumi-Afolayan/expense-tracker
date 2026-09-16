@@ -1,67 +1,78 @@
 import { useEffect, useState } from 'react'
+import { currencies } from '../data/currencies'
+import { formatCurrency } from '../utils/currency'
 
-const currencies = [
-  { code: 'USD', name: 'US Dollar' },
-  { code: 'GBP', name: 'British Pound' },
-  { code: 'EUR', name: 'Euro' },
-  { code: 'CAD', name: 'Canadian Dollar' },
-  { code: 'GHS', name: 'Ghanaian Cedi' },
-]
+function CurrencyConverter({
+  balance,
+  preferredCurrency,
+}) {
+  const [targetCurrency, setTargetCurrency] =
+    useState(
+      preferredCurrency === 'NGN' ? 'USD' : 'NGN',
+    )
 
-function CurrencyConverter({ balance }) {
-  const [rates, setRates] = useState(null)
-  const [selectedCurrency, setSelectedCurrency] = useState('USD')
+  const [rates, setRates] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const fetchExchangeRates = async () => {
-      try {
-        setLoading(true)
-        setError('')
+    const loadExchangeRates = async () => {
+      setLoading(true)
+      setError('')
 
-        // Request current conversion rates with NGN as the base currency.
+      // Naira users start by converting to USD.
+      // Other users start by converting back to Naira.
+      const defaultTarget =
+        preferredCurrency === 'NGN' ? 'USD' : 'NGN'
+
+      setTargetCurrency(defaultTarget)
+
+      try {
         const response = await fetch(
-          'https://open.er-api.com/v6/latest/NGN',
+          `https://open.er-api.com/v6/latest/${preferredCurrency}`,
         )
 
         if (!response.ok) {
-          throw new Error('Unable to retrieve exchange rates.')
+          throw new Error(
+            'Unable to load exchange rates.',
+          )
         }
 
         const data = await response.json()
 
         if (data.result !== 'success') {
-          throw new Error('The exchange-rate request failed.')
+          throw new Error(
+            'The exchange-rate service returned an error.',
+          )
         }
 
         setRates(data.rates)
       } catch (requestError) {
         setError(requestError.message)
+        setRates({})
       } finally {
         setLoading(false)
       }
     }
 
-    fetchExchangeRates()
-  }, [])
+    loadExchangeRates()
+  }, [preferredCurrency])
 
-  // Convert the current balance using the selected rate.
-  const convertedBalance = rates
-    ? balance * rates[selectedCurrency]
-    : 0
+  const selectedRate =
+    rates[targetCurrency] || 0
 
-  const formatConvertedAmount = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: selectedCurrency,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
+  const convertedBalance =
+    Number(balance) * selectedRate
+
+  const sourceCurrencyInformation =
+    currencies.find(
+      (currency) =>
+        currency.code === preferredCurrency,
+    )
 
   return (
-    <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-      <div className="mb-6">
+    <section className="mb-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <div>
         <h2 className="text-xl font-bold text-slate-900">
           Currency Converter
         </h2>
@@ -71,47 +82,45 @@ function CurrencyConverter({ balance }) {
         </p>
       </div>
 
-      {loading && (
-        <p className="rounded-xl bg-slate-50 p-5 text-slate-500">
-          Loading exchange rates...
-        </p>
-      )}
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl bg-slate-50 p-5">
+          <p className="text-sm text-slate-500">
+            Balance in{' '}
+            {sourceCurrencyInformation?.name ||
+              preferredCurrency}
+          </p>
 
-      {error && (
-        <p className="rounded-xl bg-red-50 p-5 text-red-600">
-          {error}
-        </p>
-      )}
+          <p className="mt-3 text-2xl font-bold text-slate-900">
+            {formatCurrency(
+              balance,
+              preferredCurrency,
+            )}
+          </p>
+        </div>
 
-      {!loading && !error && rates && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">
-              Balance in Nigerian Naira
-            </p>
+        <div className="rounded-xl bg-emerald-50 p-5">
+          <label
+            htmlFor="targetCurrency"
+            className="mb-2 block text-sm text-emerald-700"
+          >
+            Convert balance to
+          </label>
 
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              ₦{balance.toLocaleString()}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-emerald-50 p-5">
-            <label
-              htmlFor="currency"
-              className="block text-sm text-emerald-700"
-            >
-              Convert balance to
-            </label>
-
-            <select
-              id="currency"
-              value={selectedCurrency}
-              onChange={(event) =>
-                setSelectedCurrency(event.target.value)
-              }
-              className="mt-2 w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 outline-none focus:border-emerald-500"
-            >
-              {currencies.map((currency) => (
+          <select
+            id="targetCurrency"
+            value={targetCurrency}
+            onChange={(event) =>
+              setTargetCurrency(event.target.value)
+            }
+            className="w-full rounded-lg border border-emerald-300 bg-white px-4 py-3 outline-none focus:border-emerald-500"
+          >
+            {currencies
+              .filter(
+                (currency) =>
+                  currency.code !==
+                  preferredCurrency,
+              )
+              .map((currency) => (
                 <option
                   key={currency.code}
                   value={currency.code}
@@ -119,14 +128,30 @@ function CurrencyConverter({ balance }) {
                   {currency.code} — {currency.name}
                 </option>
               ))}
-            </select>
+          </select>
 
-            <p className="mt-4 text-2xl font-bold text-emerald-700">
-              {formatConvertedAmount(convertedBalance)}
+          {loading && (
+            <p className="mt-4 text-sm text-emerald-700">
+              Loading exchange rates...
             </p>
-          </div>
+          )}
+
+          {error && (
+            <p className="mt-4 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          {!loading && !error && (
+            <p className="mt-4 text-2xl font-bold text-emerald-700">
+              {formatCurrency(
+                convertedBalance,
+                targetCurrency,
+              )}
+            </p>
+          )}
         </div>
-      )}
+      </div>
 
       <p className="mt-4 text-xs text-slate-400">
         Rates provided by{' '}
@@ -134,7 +159,7 @@ function CurrencyConverter({ balance }) {
           href="https://www.exchangerate-api.com"
           target="_blank"
           rel="noreferrer"
-          className="underline"
+          className="underline hover:text-slate-600"
         >
           ExchangeRate-API
         </a>
