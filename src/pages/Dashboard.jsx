@@ -375,6 +375,7 @@ function Dashboard({ user }) {
         balance={balance}
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
+        preferredCurrency={preferredCurrency}
       />
 
       {currencyMessage && (
