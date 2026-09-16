@@ -9,6 +9,7 @@ import TransactionForm from '../components/TransactionForm'
 import TransactionList from '../components/TransactionList'
 import DashboardLayout from '../components/DashboardLayout'
 import DashboardLoading from '../components/DashboardLoading'
+import CurrencySettings from '../components/CurrencySettings'
 
 
 
@@ -34,6 +35,14 @@ function Dashboard({ user }) {
 
   // User and feedback states.
   const [fullName, setFullName] = useState('')
+  const [preferredCurrency, setPreferredCurrency] =
+  useState('NGN')
+
+  const [savingCurrency, setSavingCurrency] =
+    useState(false)
+
+  const [currencyMessage, setCurrencyMessage] =
+    useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -54,7 +63,7 @@ function Dashboard({ user }) {
       // Fetch the logged-in user's name.
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, preferred_currency')
         .eq('id', user.id)
         .single()
 
@@ -65,6 +74,9 @@ function Dashboard({ user }) {
       }
 
       setFullName(profile.full_name)
+      setPreferredCurrency(
+      profile.preferred_currency || 'NGN',
+    )
 
       // Fetch the logged-in user's transactions.
       const { data, error: transactionError } = await supabase
@@ -271,6 +283,31 @@ function Dashboard({ user }) {
     }
   }
 
+  
+  const handleCurrencySave = async (currencyCode) => {
+  setSavingCurrency(true)
+  setCurrencyMessage('')
+  setError('')
+
+  const { error: currencyError } = await supabase
+    .from('profiles')
+    .update({
+      preferred_currency: currencyCode,
+    })
+    .eq('id', user.id)
+
+  if (currencyError) {
+    setError(currencyError.message)
+    setSavingCurrency(false)
+    return
+  }
+
+  setPreferredCurrency(currencyCode)
+  setCurrencyMessage('Your dashboard currency has been updated.')
+  setSavingCurrency(false)
+}
+  
+  
   const handleLogout = async () => {
     await supabase.auth.signOut()
     navigate('/login')
@@ -338,6 +375,18 @@ function Dashboard({ user }) {
         balance={balance}
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
+      />
+
+      {currencyMessage && (
+        <p className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+          {currencyMessage}
+        </p>
+      )}
+
+      <CurrencySettings
+        preferredCurrency={preferredCurrency}
+        onSave={handleCurrencySave}
+        saving={savingCurrency}
       />
     </div>
 
