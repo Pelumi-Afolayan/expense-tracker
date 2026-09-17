@@ -7,8 +7,12 @@ import {
   Settings,
   WalletCards,
 } from 'lucide-react'
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 
-// These items are used by both desktop and mobile navigation.
+// Navigation items used on desktop and mobile.
 const navigationItems = [
   {
     id: 'overview',
@@ -29,6 +33,7 @@ const navigationItems = [
     id: 'settings',
     label: 'Settings',
     icon: Settings,
+    path: '/settings',
   },
 ]
 
@@ -37,25 +42,77 @@ function DashboardLayout({
   onLogout,
   children,
 }) {
-  // Keep track of the section currently visible on the screen.
-  const [activeSection, setActiveSection] =
-    useState('overview')
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Store the currently active navigation item.
+  const [activeSection, setActiveSection] = useState(
+    location.pathname === '/settings'
+      ? 'settings'
+      : 'overview',
+  )
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId)
 
-    if (section) {
-      setActiveSection(sectionId)
-
-      section.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
+    if (!section) {
+      return
     }
+
+    setActiveSection(sectionId)
+
+    section.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
+  const handleNavigation = (item) => {
+    // Settings opens as a separate page.
+    if (item.path) {
+      navigate(item.path)
+      return
+    }
+
+    // Return to the Dashboard before scrolling when
+    // the user is currently on the Settings page.
+    if (location.pathname !== '/') {
+      navigate(`/#${item.id}`)
+      return
+    }
+
+    scrollToSection(item.id)
   }
 
   useEffect(() => {
-    // Watch the dashboard sections while the user scrolls.
+    // Keep Settings highlighted on the Settings page.
+    if (location.pathname === '/settings') {
+      setActiveSection('settings')
+      return
+    }
+
+    // Scroll to a section after returning from Settings.
+    const sectionFromUrl = location.hash.replace('#', '')
+
+    if (sectionFromUrl) {
+      const timer = setTimeout(() => {
+        scrollToSection(sectionFromUrl)
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+
+    setActiveSection('overview')
+  }, [location.pathname, location.hash])
+
+  useEffect(() => {
+    // Section observation is only needed on the Dashboard.
+    if (location.pathname !== '/') {
+      return undefined
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -65,24 +122,35 @@ function DashboardLayout({
         })
       },
       {
-        // Change the active item when a section reaches
-        // the main viewing area.
         rootMargin: '-20% 0px -65% 0px',
       },
     )
 
-    navigationItems.forEach((item) => {
-      const section = document.getElementById(item.id)
+    navigationItems
+      .filter((item) => !item.path)
+      .forEach((item) => {
+        const section = document.getElementById(item.id)
 
-      if (section) {
-        observer.observe(section)
-      }
-    })
+        if (section) {
+          observer.observe(section)
+        }
+      })
 
     return () => {
       observer.disconnect()
     }
-  }, [])
+  }, [location.pathname])
+
+  const isItemActive = (item) => {
+    if (item.path) {
+      return location.pathname === item.path
+    }
+
+    return (
+      location.pathname === '/' &&
+      activeSection === item.id
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
@@ -94,7 +162,9 @@ function DashboardLayout({
           </div>
 
           <div>
-            <p className="font-bold">Expense Tracker</p>
+            <p className="font-bold">
+              Expense Tracker
+            </p>
 
             <p className="text-xs text-slate-400">
               Personal finance
@@ -105,15 +175,13 @@ function DashboardLayout({
         <nav className="mt-12 space-y-2">
           {navigationItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeSection === item.id
+            const isActive = isItemActive(item)
 
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={() =>
-                  scrollToSection(item.id)
-                }
+                onClick={() => handleNavigation(item)}
                 aria-current={
                   isActive ? 'page' : undefined
                 }
@@ -163,21 +231,26 @@ function DashboardLayout({
           </button>
         </div>
 
-        {/* Dashboard content */}
+        {/* Page content */}
         <main className="px-4 pb-28 pt-8 sm:px-6 lg:px-10 lg:pb-10">
           <div className="mx-auto max-w-7xl">
             <header className="mb-8">
               <p className="text-sm font-semibold uppercase tracking-wider text-emerald-600">
-                Financial overview
+                {location.pathname === '/settings'
+                  ? 'Account'
+                  : 'Financial overview'}
               </p>
 
               <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
-                Welcome, {firstName}
+                {location.pathname === '/settings'
+                  ? 'Manage your account'
+                  : `Welcome, ${firstName}`}
               </h1>
 
               <p className="mt-2 text-slate-500">
-                Here&apos;s what&apos;s happening with your
-                money.
+                {location.pathname === '/settings'
+                  ? 'Update your profile and dashboard preferences.'
+                  : "Here's what's happening with your money."}
               </p>
             </header>
 
@@ -190,15 +263,13 @@ function DashboardLayout({
       <nav className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-4 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden">
         {navigationItems.map((item) => {
           const Icon = item.icon
-          const isActive = activeSection === item.id
+          const isActive = isItemActive(item)
 
           return (
             <button
               key={item.id}
               type="button"
-              onClick={() =>
-                scrollToSection(item.id)
-              }
+              onClick={() => handleNavigation(item)}
               aria-current={
                 isActive ? 'page' : undefined
               }

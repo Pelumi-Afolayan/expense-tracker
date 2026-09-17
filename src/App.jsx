@@ -11,6 +11,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import UpdatePassword from './pages/UpdatePassword'
+import SettingsPage from './pages/SettingsPage'
 
 function App() {
   // Store the currently authenticated Supabase user.
@@ -120,6 +121,18 @@ function App() {
           path="*"
           element={<Navigate to="/" replace />}
         />
+
+        <Route
+          path="/settings"
+          element={
+            user ? (
+              <SettingsPage user={user} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
       </Routes>
     </>
   )

@@ -8,8 +8,6 @@ import TransactionFilters from '../components/TransactionFilters'
 import TransactionForm from '../components/TransactionForm'
 import TransactionList from '../components/TransactionList'
 import DashboardLayout from '../components/DashboardLayout'
-import DashboardLoading from '../components/DashboardLoading'
-import CurrencySettings from '../components/CurrencySettings'
 
 
 
@@ -38,11 +36,7 @@ function Dashboard({ user }) {
   const [preferredCurrency, setPreferredCurrency] =
   useState('NGN')
 
-  const [savingCurrency, setSavingCurrency] =
-    useState(false)
 
-  const [currencyMessage, setCurrencyMessage] =
-    useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -377,18 +371,6 @@ function Dashboard({ user }) {
         totalExpenses={totalExpenses}
         preferredCurrency={preferredCurrency}
       />
-
-      {currencyMessage && (
-        <p className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
-          {currencyMessage}
-        </p>
-      )}
-
-      <CurrencySettings
-        preferredCurrency={preferredCurrency}
-        onSave={handleCurrencySave}
-        saving={savingCurrency}
-      />
     </div>
 
     <div id="analytics" className='scroll-mt-24'>
@@ -428,6 +410,12 @@ function Dashboard({ user }) {
         preferredCurrency={preferredCurrency}
       />
     </div>
+
+    <div
+      id="transactions"
+      className="scroll-mt-24"
+    ></div>
+
   </DashboardLayout>
 )
 }
