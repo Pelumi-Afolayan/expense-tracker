@@ -4,9 +4,11 @@ import {
   BarChart3,
   LayoutDashboard,
   LogOut,
+  Settings,
   WalletCards,
 } from 'lucide-react'
 
+// These items are used by both desktop and mobile navigation.
 const navigationItems = [
   {
     id: 'overview',
@@ -23,6 +25,11 @@ const navigationItems = [
     label: 'Transactions',
     icon: ArrowLeftRight,
   },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+  },
 ]
 
 function DashboardLayout({
@@ -30,6 +37,7 @@ function DashboardLayout({
   onLogout,
   children,
 }) {
+  // Keep track of the section currently visible on the screen.
   const [activeSection, setActiveSection] =
     useState('overview')
 
@@ -47,7 +55,7 @@ function DashboardLayout({
   }
 
   useEffect(() => {
-    // Watch the sections and update the active navigation item.
+    // Watch the dashboard sections while the user scrolls.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -57,6 +65,8 @@ function DashboardLayout({
         })
       },
       {
+        // Change the active item when a section reaches
+        // the main viewing area.
         rootMargin: '-20% 0px -65% 0px',
       },
     )
@@ -85,6 +95,7 @@ function DashboardLayout({
 
           <div>
             <p className="font-bold">Expense Tracker</p>
+
             <p className="text-xs text-slate-400">
               Personal finance
             </p>
@@ -100,7 +111,12 @@ function DashboardLayout({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => scrollToSection(item.id)}
+                onClick={() =>
+                  scrollToSection(item.id)
+                }
+                aria-current={
+                  isActive ? 'page' : undefined
+                }
                 className={
                   isActive
                     ? 'flex w-full items-center gap-3 rounded-xl bg-emerald-500 px-4 py-3 text-left font-medium text-slate-950'
@@ -132,14 +148,16 @@ function DashboardLayout({
               <WalletCards size={22} />
             </div>
 
-            <p className="font-bold">Expense Tracker</p>
+            <p className="font-bold">
+              Expense Tracker
+            </p>
           </div>
 
           <button
             type="button"
             onClick={onLogout}
             aria-label="Log out"
-            className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 hover:text-white"
+            className="rounded-lg p-2 text-slate-300 transition hover:bg-slate-800 hover:text-white"
           >
             <LogOut size={21} />
           </button>
@@ -158,7 +176,8 @@ function DashboardLayout({
               </h1>
 
               <p className="mt-2 text-slate-500">
-                Here&apos;s what&apos;s happening with your money.
+                Here&apos;s what&apos;s happening with your
+                money.
               </p>
             </header>
 
@@ -166,29 +185,35 @@ function DashboardLayout({
           </div>
         </main>
       </div>
-            {/* Mobile bottom navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-3 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden">
-        {navigationItems.map((item) => {
-            const Icon = item.icon
-            const isActive = activeSection === item.id
 
-            return (
+      {/* Mobile bottom navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-4 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden">
+        {navigationItems.map((item) => {
+          const Icon = item.icon
+          const isActive = activeSection === item.id
+
+          return (
             <button
-                key={item.id}
-                type="button"
-                onClick={() => scrollToSection(item.id)}
-                className={
+              key={item.id}
+              type="button"
+              onClick={() =>
+                scrollToSection(item.id)
+              }
+              aria-current={
+                isActive ? 'page' : undefined
+              }
+              className={
                 isActive
-                    ? 'flex flex-col items-center gap-1 rounded-xl bg-emerald-50 px-2 py-2 text-xs font-semibold text-emerald-700'
-                    : 'flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-xs font-medium text-slate-500'
-                }
+                  ? 'flex flex-col items-center gap-1 rounded-xl bg-emerald-50 px-1 py-2 text-xs font-semibold text-emerald-700'
+                  : 'flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs font-medium text-slate-500'
+              }
             >
-                <Icon size={20} />
-                {item.label}
+              <Icon size={20} />
+              {item.label}
             </button>
-            )
+          )
         })}
-        </nav>
+      </nav>
     </div>
   )
 }
