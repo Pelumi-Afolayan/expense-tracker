@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
+import ConnectionStatus from './components/ConnectionStatus'
 import { supabase } from './lib/supabase'
 import Dashboard from './pages/Dashboard'
 import ForgotPassword from './pages/ForgotPassword'
@@ -30,7 +31,7 @@ function App() {
 
     getCurrentSession()
 
-    // Listen for login, logout and and password-recovery events.
+    // Listen for login, logout and password-recovery events.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
@@ -57,57 +58,70 @@ function App() {
   }
 
   return (
-    <Routes>
-      {/* Only authenticated users can open the dashboard. */}
-      <Route
-        path="/"
-        element={
-          user ? (
-            <Dashboard user={user} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+    <>
+      {/* Display internet connection changes on every page. */}
+      <ConnectionStatus />
 
-      {/* Logged-in users do not need authentication pages. */}
-      <Route
-        path="/login"
-        element={
-          user ? <Navigate to="/" replace /> : <Login />
-        }
-      />
+      <Routes>
+        {/* Only authenticated users can open the dashboard. */}
+        <Route
+          path="/"
+          element={
+            user ? (
+              <Dashboard user={user} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
-      <Route
-        path="/register"
-        element={
-          user ? <Navigate to="/" replace /> : <Register />
-        }
-      />
+        {/* Logged-in users do not need authentication pages. */}
+        <Route
+          path="/login"
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Login />
+            )
+          }
+        />
 
-      <Route
-        path="/forgot-password"
-        element={
-          user ? (
-            <Navigate to="/" replace />
-          ) : (
-            <ForgotPassword />
-          )
-        }
-      />
+        <Route
+          path="/register"
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Register />
+            )
+          }
+        />
 
-      {/* Recovery links open this page with a temporary session. */}
-      <Route
-        path="/update-password"
-        element={<UpdatePassword />}
-      />
+        <Route
+          path="/forgot-password"
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <ForgotPassword />
+            )
+          }
+        />
 
-      {/* Send unknown addresses to the appropriate page. */}
-      <Route
-        path="*"
-        element={<Navigate to="/" replace />}
-      />
-    </Routes>
+        {/* Recovery links open this page with a temporary session. */}
+        <Route
+          path="/update-password"
+          element={<UpdatePassword />}
+        />
+
+        {/* Send unknown addresses to the appropriate page. */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
+    </>
   )
 }
 
