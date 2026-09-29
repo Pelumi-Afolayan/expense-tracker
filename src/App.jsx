@@ -6,12 +6,13 @@ import {
 } from 'react-router-dom'
 import ConnectionStatus from './components/ConnectionStatus'
 import { supabase } from './lib/supabase'
+import AdminPage from './pages/AdminPage'
 import Dashboard from './pages/Dashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import UpdatePassword from './pages/UpdatePassword'
 import SettingsPage from './pages/SettingsPage'
+import UpdatePassword from './pages/UpdatePassword'
 
 function App() {
   // Store the currently authenticated Supabase user.
@@ -76,6 +77,29 @@ function App() {
           }
         />
 
+        <Route
+          path="/settings"
+          element={
+            user ? (
+              <SettingsPage user={user} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* The Edge Function performs the final admin check. */}
+        <Route
+          path="/admin"
+          element={
+            user ? (
+              <AdminPage user={user} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
         {/* Logged-in users do not need authentication pages. */}
         <Route
           path="/login"
@@ -110,7 +134,7 @@ function App() {
           }
         />
 
-        {/* Recovery links open this page with a temporary session. */}
+        {/* Recovery links open with a temporary session. */}
         <Route
           path="/update-password"
           element={<UpdatePassword />}
@@ -121,18 +145,6 @@ function App() {
           path="*"
           element={<Navigate to="/" replace />}
         />
-
-        <Route
-          path="/settings"
-          element={
-            user ? (
-              <SettingsPage user={user} />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-
       </Routes>
     </>
   )

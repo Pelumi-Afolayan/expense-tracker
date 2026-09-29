@@ -5,15 +5,17 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  ShieldCheck,
   WalletCards,
 } from 'lucide-react'
 import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 
-// Navigation items used on desktop and mobile.
-const navigationItems = [
+// Dashboard navigation shared by every user.
+const standardNavigationItems = [
   {
     id: 'overview',
     label: 'Overview',
@@ -37,6 +39,14 @@ const navigationItems = [
   },
 ]
 
+// This item is only added for administrators.
+const adminNavigationItem = {
+  id: 'admin',
+  label: 'Admin',
+  icon: ShieldCheck,
+  path: '/admin',
+}
+
 function DashboardLayout({
   firstName,
   onLogout,
@@ -45,12 +55,44 @@ function DashboardLayout({
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Store whether the current user is an administrator.
+  const [isAdmin, setIsAdmin] = useState(false)
+
   // Store the currently active navigation item.
   const [activeSection, setActiveSection] = useState(
     location.pathname === '/settings'
       ? 'settings'
-      : 'overview',
+      : location.pathname === '/admin'
+        ? 'admin'
+        : 'overview',
   )
+
+  // Add Admin to the navigation only for administrators.
+  const navigationItems = isAdmin
+    ? [...standardNavigationItems, adminNavigationItem]
+    : standardNavigationItems
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data, error } = await supabase.rpc(
+        'is_current_user_admin',
+      )
+
+      if (error) {
+        console.error(
+          'Unable to check administrator status:',
+          error,
+        )
+
+        setIsAdmin(false)
+        return
+      }
+
+      setIsAdmin(Boolean(data))
+    }
+
+    checkAdminStatus()
+  }, [])
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId)
@@ -68,14 +110,14 @@ function DashboardLayout({
   }
 
   const handleNavigation = (item) => {
-    // Settings opens as a separate page.
+    // Settings and Admin open as separate pages.
     if (item.path) {
       navigate(item.path)
       return
     }
 
     // Return to the Dashboard before scrolling when
-    // the user is currently on the Settings page.
+    // the user is currently on another page.
     if (location.pathname !== '/') {
       navigate(`/#${item.id}`)
       return
@@ -85,13 +127,17 @@ function DashboardLayout({
   }
 
   useEffect(() => {
-    // Keep Settings highlighted on the Settings page.
     if (location.pathname === '/settings') {
       setActiveSection('settings')
       return
     }
 
-    // Scroll to a section after returning from Settings.
+    if (location.pathname === '/admin') {
+      setActiveSection('admin')
+      return
+    }
+
+    // Scroll after returning from another page.
     const sectionFromUrl = location.hash.replace('#', '')
 
     if (sectionFromUrl) {
@@ -126,7 +172,7 @@ function DashboardLayout({
       },
     )
 
-    navigationItems
+    standardNavigationItems
       .filter((item) => !item.path)
       .forEach((item) => {
         const section = document.getElementById(item.id)
@@ -151,6 +197,11 @@ function DashboardLayout({
       activeSection === item.id
     )
   }
+
+  const isSettingsPage =
+    location.pathname === '/settings'
+
+  const isAdminPage = location.pathname === '/admin'
 
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
@@ -236,21 +287,27 @@ function DashboardLayout({
           <div className="mx-auto max-w-7xl">
             <header className="mb-8">
               <p className="text-sm font-semibold uppercase tracking-wider text-emerald-600">
-                {location.pathname === '/settings'
-                  ? 'Account'
-                  : 'Financial overview'}
+                {isAdminPage
+                  ? 'Administration'
+                  : isSettingsPage
+                    ? 'Account'
+                    : 'Financial overview'}
               </p>
 
               <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">
-                {location.pathname === '/settings'
-                  ? 'Manage your account'
-                  : `Welcome, ${firstName}`}
+                {isAdminPage
+                  ? 'Admin Dashboard'
+                  : isSettingsPage
+                    ? 'Manage your account'
+                    : `Welcome, ${firstName}`}
               </h1>
 
               <p className="mt-2 text-slate-500">
-                {location.pathname === '/settings'
-                  ? 'Update your profile and dashboard preferences.'
-                  : "Here's what's happening with your money."}
+                {isAdminPage
+                  ? 'Manage registered users and review account feedback.'
+                  : isSettingsPage
+                    ? 'Update your profile and dashboard preferences.'
+                    : "Here's what's happening with your money."}
               </p>
             </header>
 
@@ -260,7 +317,13 @@ function DashboardLayout({
       </div>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 grid grid-cols-4 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden">
+      <nav
+        className={
+          isAdmin
+            ? 'fixed bottom-0 left-0 right-0 z-50 grid grid-cols-5 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden'
+            : 'fixed bottom-0 left-0 right-0 z-50 grid grid-cols-4 border-t border-slate-200 bg-white px-2 py-2 shadow-lg lg:hidden'
+        }
+      >
         {navigationItems.map((item) => {
           const Icon = item.icon
           const isActive = isItemActive(item)
@@ -275,8 +338,8 @@ function DashboardLayout({
               }
               className={
                 isActive
-                  ? 'flex flex-col items-center gap-1 rounded-xl bg-emerald-50 px-1 py-2 text-xs font-semibold text-emerald-700'
-                  : 'flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-xs font-medium text-slate-500'
+                  ? 'flex flex-col items-center gap-1 rounded-xl bg-emerald-50 px-1 py-2 text-[11px] font-semibold text-emerald-700'
+                  : 'flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium text-slate-500'
               }
             >
               <Icon size={20} />
