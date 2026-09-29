@@ -8,7 +8,7 @@ import TransactionFilters from '../components/TransactionFilters'
 import TransactionForm from '../components/TransactionForm'
 import TransactionList from '../components/TransactionList'
 import DashboardLayout from '../components/DashboardLayout'
-
+import ExportTransactions from '../components/ExportTransactions'
 
 
 // Return today's date in the format required by an HTML date input.
@@ -401,6 +401,11 @@ function Dashboard({ user }) {
         categories={categories}
         onChange={handleFilterChange}
         onClear={handleClearFilters}
+      />
+
+      <ExportTransactions
+        transactions={filteredTransactions}
+        preferredCurrency={preferredCurrency}
       />
 
       <TransactionList
