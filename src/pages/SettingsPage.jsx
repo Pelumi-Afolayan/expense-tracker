@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AccountSettings from '../components/AccountSettings'
 import DashboardLayout from '../components/DashboardLayout'
+import DeleteAccountSection from '../components/DeleteAccountSection'
 import { supabase } from '../lib/supabase'
 
 function SettingsPage({ user }) {
@@ -79,6 +80,17 @@ function SettingsPage({ user }) {
     navigate('/login')
   }
 
+  const handleAccountDeleted = async () => {
+    // Clear the deleted user's session from this device.
+    await supabase.auth.signOut({
+      scope: 'local',
+    })
+
+    navigate('/login', {
+      replace: true,
+    })
+  }
+
   const firstName = fullName.split(' ')[0] || 'User'
 
   if (loading) {
@@ -110,6 +122,10 @@ function SettingsPage({ user }) {
         onCurrencySave={handleCurrencySave}
         savingCurrency={savingCurrency}
         currencyMessage={currencyMessage}
+      />
+
+      <DeleteAccountSection
+        onAccountDeleted={handleAccountDeleted}
       />
     </DashboardLayout>
   )
