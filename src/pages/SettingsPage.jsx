@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link,
+  useNavigate } 
+  from 'react-router-dom'
 import AccountSettings from '../components/AccountSettings'
 import DashboardLayout from '../components/DashboardLayout'
 import DeleteAccountSection from '../components/DeleteAccountSection'
@@ -123,6 +125,34 @@ function SettingsPage({ user }) {
         savingCurrency={savingCurrency}
         currencyMessage={currencyMessage}
       />
+
+      {/* Legal information */}
+      <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="text-xl font-bold text-slate-900">
+          Legal and Privacy
+        </h2>
+
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Learn how Expensidify handles your information and
+          review the rules for using the application.
+        </p>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to="/privacy"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            Privacy Policy
+          </Link>
+
+          <Link
+            to="/terms"
+            className="rounded-xl border border-slate-300 px-5 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            Terms of Use
+          </Link>
+        </div>
+      </section>
 
       <DeleteAccountSection
         onAccountDeleted={handleAccountDeleted}

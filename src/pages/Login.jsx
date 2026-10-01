@@ -160,6 +160,24 @@ function Login() {
           Create one
         </Link>
       </p>
+
+      <p className="mt-4 text-center text-xs leading-5 text-slate-400">
+        By continuing, you agree to our{' '}
+        <Link
+          to="/terms"
+          className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+        >
+          Terms of Use
+        </Link>{' '}
+        and acknowledge our{' '}
+        <Link
+          to="/privacy"
+          className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+        >
+          Privacy Policy
+        </Link>
+        .
+      </p>
     </AuthLayout>
   )
 }

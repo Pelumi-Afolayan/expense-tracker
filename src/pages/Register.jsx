@@ -251,14 +251,32 @@ function Register() {
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500">
-        Already have an account?{' '}
-        <Link
-          to="/login"
-          className="font-semibold text-emerald-600 hover:text-emerald-700"
-        >
-          Log in
-        </Link>
-      </p>
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="font-semibold text-emerald-600 hover:text-emerald-700"
+          >
+            Log in
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-xs leading-5 text-slate-400">
+          By creating an account, you agree to our{' '}
+          <Link
+            to="/terms"
+            className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+          >
+            Terms of Use
+          </Link>{' '}
+          and acknowledge our{' '}
+          <Link
+            to="/privacy"
+            className="font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
     </AuthLayout>
   )
 }

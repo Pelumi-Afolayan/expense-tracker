@@ -10,8 +10,10 @@ import AdminPage from './pages/AdminPage'
 import Dashboard from './pages/Dashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import Login from './pages/Login'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import Register from './pages/Register'
 import SettingsPage from './pages/SettingsPage'
+import TermsOfUse from './pages/TermsOfUse'
 import UpdatePassword from './pages/UpdatePassword'
 
 function App() {
@@ -65,6 +67,17 @@ function App() {
       <ConnectionStatus />
 
       <Routes>
+        {/* Public legal pages */}
+        <Route
+          path="/privacy"
+          element={<PrivacyPolicy />}
+        />
+
+        <Route
+          path="/terms"
+          element={<TermsOfUse />}
+        />
+
         {/* Only authenticated users can open the dashboard. */}
         <Route
           path="/"
