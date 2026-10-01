@@ -25,3 +25,10 @@ dist-ssr
 .env.local
 # Generated PWA development files
 dev-dist/
+dist
+
+
+# Environment variables
+.env
+.env.*
+!.env.example

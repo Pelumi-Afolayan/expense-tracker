@@ -13,7 +13,7 @@ function GoogleAuthButton() {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://expensidify.vercel.app',
+          redirectTo: `${window.location.origin}/`,
         },
       })
 
